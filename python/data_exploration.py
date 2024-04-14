@@ -112,29 +112,35 @@ summary_df.to_csv('summary.csv', index=False)
   #Price convert to number DONE
   #Reviews convert to numbers
 
-# Handling missing values
+# Handling values
 numeric_columns = listings.select_dtypes(include=['int64', 'float64']).columns
 categorical_columns = listings.select_dtypes(include=['object']).columns
 
 # Impute missing values for numerical columns with mean
 listings[numeric_columns] = listings[numeric_columns].fillna(listings[numeric_columns].mean())
 
-# Feature selection
+# Feature selection and dropping obsolete columns
 exclude_columns = ['scrape_id', 'last_scraped', 'source', 'name', 'description', 'neighbourhood', 
                    'has_availability', 'reviews_per_month', 'amenities']
 columns_to_drop = [col for col in exclude_columns if col in listings.columns]
 listings = listings.drop(columns=columns_to_drop)
 
-# Data transformation
+###### Data transformation --->:
 
 # Convert 'price' column to numeric
 listings['price'] = listings['price'].replace('[\$,]', '', regex=True).astype(float)
 
+
+
+###### Data encoding --->:
 # Encoding categorical variables
 label_encoders = {}
 for column in categorical_columns:
     label_encoders[column] = LabelEncoder()
     listings[column] = label_encoders[column].fit_transform(listings[column])
+
+
+##############################################DATA MODELING ############################################
 
 # Splitting the data
 X = listings.drop(columns=['price'])
@@ -150,6 +156,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 
 
+###########################################################################################################
 ##############################################CODE FROM TEACHER############################################
 
 # Subset data
