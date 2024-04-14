@@ -4,7 +4,8 @@ import numpy as np # used for working with arrays
 import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
 import re
 
 path_to_data = r"..\data\listings_detail.csv" 
@@ -146,9 +147,9 @@ listings['bathrooms_shared'] = listings['bathrooms_text'].str.contains('shared')
 # Encoding categorical variables
 label_encoders = {}
 for column in categorical_columns:
-    label_encoders[column] = LabelEncoder()
-    listings[column] = label_encoders[column].fit_transform(listings[column])
-
+    if column in listings.columns:
+      label_encoders[column] = LabelEncoder()
+      listings[column] = label_encoders[column].fit_transform(listings[column])
 
 ##############################################DATA MODELING ############################################
 
@@ -162,9 +163,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 #y_train.to_csv('y_train_regression.csv', index=False)
 #X_test.to_csv('X_test_regression.csv', index=False)
 #y_test.to_csv('y_test_regression.csv', index=False)
-
-
-
 
 ###########################################################################################################
 ##############################################CODE FROM TEACHER############################################
