@@ -40,6 +40,7 @@ def describe_column(column):
     print(f"Column: {column}")
     print(f"Variable type: {listings[column].dtype}")
     print(f"Number of non-null values: {listings[column].notnull().sum()}")
+    print(f"Number of null values: {listings[column].isnull().sum()}")
     print(f"Number of unique values: {listings[column].nunique()}")
     
     if listings[column].dtype == 'object':
@@ -76,18 +77,20 @@ describe_column('property_type')
 describe_column('beds')
 
 
+
 ########## SUMARIZE COLUMN ##############
 # Function to summarize each column
 def summarize_column(column):
     data_type = listings[column].dtype
     non_null_count = listings[column].notnull().sum()
+    null_count = listings[column].isnull().sum()
     unique_count = listings[column].nunique()
     min_value = listings[column].min() if data_type in ['int64', 'float64'] else None
     max_value = listings[column].max() if data_type in ['int64', 'float64'] else None
     mean_value = listings[column].mean() if data_type in ['int64', 'float64'] else None
     std_dev = listings[column].std() if data_type in ['int64', 'float64'] else None
     
-    summary = [column, data_type, non_null_count, unique_count, min_value, max_value, mean_value, std_dev]
+    summary = [column, data_type, non_null_count, null_count, unique_count, min_value, max_value, mean_value, std_dev]
     return summary
 
 # List of columns to summarize
@@ -99,7 +102,7 @@ for column in columns_to_summarize:
     summary_table.append(summarize_column(column))
 
 # Create a DataFrame from the summary
-summary_df = pd.DataFrame(summary_table, columns=["Column", "Data Type", "Non-null Count", "Unique Count", "Min Value", "Max Value", "Mean Value", "Standard Deviation"])
+summary_df = pd.DataFrame(summary_table, columns=["Column", "Data Type", "Non-null Count", "Null Count", "Unique Count", "Min Value", "Max Value", "Mean Value", "Standard Deviation"])
 
 # Output the summary to a CSV file
 summary_df.to_csv('summary.csv', index=False)
