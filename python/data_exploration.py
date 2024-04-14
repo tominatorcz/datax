@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from tabulate import tabulate
 import re
 
 path_to_data = r"..\data\listings_detail.csv" 
@@ -110,7 +109,6 @@ summary_df.to_csv('summary.csv', index=False)
 #TODO WITH DATA:
   #Bathroom needs to be ajdusted
   #Price convert to number DONE
-  #Reviews convert to numbers
 
 # Handling values
 numeric_columns = listings.select_dtypes(include=['int64', 'float64']).columns
@@ -130,10 +128,19 @@ listings = listings.drop(columns=columns_to_drop)
 # Convert 'price' column to numeric
 listings['price'] = listings['price'].replace('[\$,]', '', regex=True).astype(float)
 
-#Bathroom needs to be ajdusted
+# Fill empty values in the 'bathrooms_text' column with '1'
+listings['bathrooms_text'] = listings['bathrooms_text'].fillna('1')
 
-#Reviews convert to numbers
+# Replace "Half-bath" with "0.5" in the 'bathrooms_text' column
+listings['bathrooms_text'] = listings['bathrooms_text'].replace("Half-bath", "0.5")
+listings['bathrooms_text'] = listings['bathrooms_text'].replace("Private half-bath", "0.5")
+listings['bathrooms_text'] = listings['bathrooms_text'].replace("Shared half-bath", "0.5 shared")
 
+# Function to extract the number from the 'bathrooms_text' column
+listings['bathrooms'] = listings['bathrooms_text'].apply(lambda x: float(x.split()[0]) if pd.notnull(x) else None)
+
+# Create the 'bathrooms_shared' column
+listings['bathrooms_shared'] = listings['bathrooms_text'].str.contains('shared').astype(int)
 
 ###### Data encoding --->:
 # Encoding categorical variables
@@ -163,7 +170,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 ##############################################CODE FROM TEACHER############################################
 
 # Subset data
-listings["age"] # columns
+listings[""] # columns
 listings[0:2] # rows
 listings[5:] # rows
 
@@ -178,7 +185,7 @@ listings["age"].size
 
 # Data types
 type(listings)
-type(listings["age"])
+type(listings["bathrooms_text"])
 
 listings.dtypes
 listings["age"].dtype
@@ -207,9 +214,9 @@ print(list(range(0, 100, 10)))
 listings.describe()
 listings.describe(include='all')
 
-listings["age"].max()
+listings['bathrooms_shared'].max()
 listings["age"].min()
-listings["age"].mean()
+listings["bathrooms"].mean()
 listings["age"].std()
 listings["age"].median()
 listings["age"].quantile([0.5])
