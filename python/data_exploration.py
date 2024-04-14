@@ -130,6 +130,9 @@ listings = listings.drop(columns=columns_to_drop)
 # Convert 'price' column to numeric
 listings['price'] = listings['price'].replace('[\$,]', '', regex=True).astype(float)
 
+#Bathroom needs to be ajdusted
+
+#Reviews convert to numbers
 
 
 ###### Data encoding --->:
