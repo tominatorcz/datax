@@ -3,7 +3,10 @@ import pandas as pd # used for working with data sets
 import numpy as np # used for working with arrays
 import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 from tabulate import tabulate
+import re
 
 path_to_data = r"..\data\listings_detail.csv" 
 
@@ -106,10 +109,43 @@ summary_df.to_csv('summary.csv', index=False)
 
 #TODO WITH DATA:
   #Bathroom needs to be ajdusted
-  #Price convert to number
+  #Price convert to number DONE
   #Reviews convert to numbers
 
+# Handling missing values
+numeric_columns = listings.select_dtypes(include=['int64', 'float64']).columns
+categorical_columns = listings.select_dtypes(include=['object']).columns
 
+# Impute missing values for numerical columns with mean
+listings[numeric_columns] = listings[numeric_columns].fillna(listings[numeric_columns].mean())
+
+# Feature selection
+exclude_columns = ['scrape_id', 'last_scraped', 'source', 'name', 'description', 'neighbourhood', 
+                   'has_availability', 'reviews_per_month', 'amenities']
+columns_to_drop = [col for col in exclude_columns if col in listings.columns]
+listings = listings.drop(columns=columns_to_drop)
+
+# Data transformation
+
+# Convert 'price' column to numeric
+listings['price'] = listings['price'].replace('[\$,]', '', regex=True).astype(float)
+
+# Encoding categorical variables
+label_encoders = {}
+for column in categorical_columns:
+    label_encoders[column] = LabelEncoder()
+    listings[column] = label_encoders[column].fit_transform(listings[column])
+
+# Splitting the data
+X = listings.drop(columns=['price'])
+y = listings['price']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Output the preprocessed data
+#X_train.to_csv('X_train_regression.csv', index=False)
+#y_train.to_csv('y_train_regression.csv', index=False)
+#X_test.to_csv('X_test_regression.csv', index=False)
+#y_test.to_csv('y_test_regression.csv', index=False)
 
 
 
