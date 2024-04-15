@@ -89,7 +89,7 @@ for column in listings.columns:
 
 describe_column('neighbourhood_cleansed')
 describe_column('property_type')
-describe_column('beds')
+describe_column('last_scraped')
 
 
 ########## SUMARIZE COLUMN ##############
