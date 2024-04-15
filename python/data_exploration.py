@@ -111,7 +111,7 @@ summary_df.to_csv('summary.csv', index=False)
 ##############################################DATA PREPARATION#############################################
 
 #TODO WITH DATA:
-  #Bathroom needs to be ajdusted
+
   #Price convert to number DONE
 
 # Handling values
@@ -132,17 +132,15 @@ listings = listings.drop(columns=columns_to_drop)
 # Convert 'price' column to numeric
 listings['price'] = listings['price'].replace('[\$,]', '', regex=True).astype(float)
 
+# Bathroom needs to be ajdusted
 # Fill empty values in the 'bathrooms_text' column with '1'
 listings['bathrooms_text'] = listings['bathrooms_text'].fillna('1')
-
 # Replace "Half-bath" with "0.5" in the 'bathrooms_text' column
 listings['bathrooms_text'] = listings['bathrooms_text'].replace("Half-bath", "0.5")
 listings['bathrooms_text'] = listings['bathrooms_text'].replace("Private half-bath", "0.5")
 listings['bathrooms_text'] = listings['bathrooms_text'].replace("Shared half-bath", "0.5 shared")
-
 # Function to extract the number from the 'bathrooms_text' column
 listings['bathrooms'] = listings['bathrooms_text'].apply(lambda x: float(x.split()[0]) if pd.notnull(x) else None)
-
 # Create the 'bathrooms_shared' column
 listings['bathrooms_shared'] = listings['bathrooms_text'].str.contains('shared').astype(int)
 
