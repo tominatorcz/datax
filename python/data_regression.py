@@ -8,7 +8,24 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
 import re
 
-path_to_data = r"..\data\listings_detail.csv" 
+###COMBINE ALL .CSVS INTO ONE
+file_paths = [r"..\data\listings_detail_6-23.csv" , r"..\data\listings_detail_9-23.csv" , r"..\data\listings_detail_12-23.csv" ]
+
+# List to store DataFrames for each CSV
+dfs = []
+
+# Read each CSV file into a DataFrame and store in the list
+for file_path in file_paths:
+    df = pd.read_csv(file_path)
+    dfs.append(df)
+
+# Concatenate all DataFrames in the list along the rows
+combined_df = pd.concat(dfs, ignore_index=True)
+
+# Write the combined DataFrame to a new CSV file
+combined_df.to_csv(r"..\data\combined.csv" , index=False)
+
+path_to_data = r"..\data\combined.csv" 
 
 listings = pd.read_csv(path_to_data)
 
