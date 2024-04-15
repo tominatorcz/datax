@@ -37,7 +37,7 @@ listings = listings.drop(columns=columns_to_drop)
 # Convert 'price' column to numeric
 listings['price'] = listings['price'].replace('[\$,]', '', regex=True).astype(float)
 
-# Convert 'price' column to numeric
+# Convert 'host_response_rate' column to numeric
 listings['host_response_rate'] = listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
 
 # Bathroom needs to be ajdusted
@@ -73,7 +73,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 #X_test.to_csv('X_test_regression.csv', index=False)
 #y_test.to_csv('y_test_regression.csv', index=False)
 
-### RANDOM STUFF IGNORE ###
+##### TESTING MODELLING IGNORE #######
+
 from sklearn.impute import SimpleImputer
 
 # Handling missing values
