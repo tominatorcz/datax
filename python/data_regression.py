@@ -5,29 +5,21 @@ import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
-import re
+from sklearn.preprocessing import LabelEncoder
+import pandas as pd
+import glob
 
-###COMBINE ALL .CSVS INTO ONE
-file_paths = [r"..\data\listings_detail_6-23.csv" , r"..\data\listings_detail_9-23.csv" , r"..\data\listings_detail_12-23.csv" ]
+# Get all file paths in the directory
+file_paths = glob.glob(r"..\data\listings_detail*.csv")
 
-# List to store DataFrames for each CSV
-dfs = []
-
-# Read each CSV file into a DataFrame and store in the list
-for file_path in file_paths:
-    df = pd.read_csv(file_path)
-    dfs.append(df)
-
-# Concatenate all DataFrames in the list along the rows
-combined_df = pd.concat(dfs, ignore_index=True)
+# Read all CSV files into DataFrames and concatenate them
+combined_df = pd.concat((pd.read_csv(file) for file in file_paths), ignore_index=True)
 
 # Write the combined DataFrame to a new CSV file
-combined_df.to_csv(r"..\data\combined.csv" , index=False)
+combined_df.to_csv(r"..\data\combined.csv", index=False)
 
-path_to_data = r"..\data\combined.csv" 
-
-listings = pd.read_csv(path_to_data)
+# Read the combined CSV file into a DataFrame
+listings = pd.read_csv(r"..\data\combined.csv")
 
 ##############################################DATA PREPARATION#############################################
 
