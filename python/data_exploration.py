@@ -1,12 +1,5 @@
 ### Dependencies ----------------------------------------------------------------
 import pandas as pd # used for working with data sets
-import numpy as np # used for working with arrays
-import matplotlib.pyplot as plt # used for plotting
-import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
-import re
 
 path_to_data = r"..\data\listings_detail.csv" 
 
