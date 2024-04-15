@@ -5,12 +5,21 @@ import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
-import re
+from sklearn.preprocessing import LabelEncoder
+import pandas as pd
+import glob
 
-path_to_data = r"..\data\listings_detail.csv" 
+# Get all file paths in the directory
+file_paths = glob.glob(r"..\data\listings_detail*.csv")
 
-listings = pd.read_csv(path_to_data)
+# Read all CSV files into DataFrames and concatenate them
+combined_df = pd.concat((pd.read_csv(file) for file in file_paths), ignore_index=True)
+
+# Write the combined DataFrame to a new CSV file
+combined_df.to_csv(r"..\data\combined.csv", index=False)
+
+# Read the combined CSV file into a DataFrame
+listings = pd.read_csv(r"..\data\combined.csv")
 
 ##############################################DATA PREPARATION#############################################
 
