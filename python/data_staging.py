@@ -25,3 +25,14 @@ for file_name in os.listdir(folder_path):
 for df_name, df in dataframes.items():
     print(f"DataFrame {df_name}:")
     print(df.head())
+
+
+print('merged_calendar_data')
+print(dataframes['merged_calendar_data']['date'].min())
+print(dataframes['merged_calendar_data']['date'].max())
+print('calendar_9-23')
+print(dataframes['calendar_9-23']['date'].min())
+print(dataframes['calendar_9-23']['date'].max())
+print('calendar_12-23')
+print(dataframes['calendar_12-23']['date'].min())
+print(dataframes['calendar_12-23']['date'].max())
