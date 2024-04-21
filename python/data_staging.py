@@ -98,6 +98,7 @@ def listings_transformation():
     listings['host_is_superhost'].fillna(value='f', inplace=True)
     # Create boolean column, t=1, f=0
     listings['host_is_superhost_bool'] = listings['host_is_superhost'].map({'t': 1, 'f': 0})
+    listings['host_is_superhost'] = listings['host_is_superhost_bool']
 
     ### host_total_listings_count
 
