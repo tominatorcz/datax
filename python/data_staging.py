@@ -3,6 +3,7 @@ import pandas as pd # used for working with data sets
 import numpy as np # used for working with arrays
 import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
+from datetime import datetime
 
 import os
 
@@ -19,16 +20,10 @@ for file_name in os.listdir(folder_path):
         df_name = os.path.splitext(file_name)[0]  # Extract the filename without extension
         dataframes[df_name] = pd.read_csv(file_path)
 
-# Optionally, you can perform operations on the dataframes here
-# For example:
-# for df_name, df in dataframes.items():
-#    print(f"DataFrame {df_name}:")
-#    print(df.head())
-
 ##### COMBINE LISTINGS
 def combine_listings():
     # Combine the DataFrames
-    combined_listings = pd.concat([dataframes["listings_detail_6-23"], dataframes["listings_detail_9-23"], dataframes["listings_detail_12-23"]])
+    combined_listings = pd.concat([dataframes["listings_detail_6-23"], dataframes["listings_detail_9-23"]])
     
     # Sort by 'last_scraped' column in descending order to ensure the newest entries are on top
     combined_listings = combined_listings.sort_values(by='last_scraped', ascending=False)
@@ -51,19 +46,47 @@ def combine_listings():
 
 ##### TRANSFORM LISTINGS
 def listings_transformation():
-    combined_listings = combine_listings()
+    listings = combine_listings()
 
     ### description
+    # replace not null values with words count
+    listings['description'] = listings[listings['description'].notnull()]['description'].str.split().str.len()
+    # replace null values with 0
+    listings['description'].fillna(0, inplace=True)
+    # Define bins and labels
+    bins = [-1, 0, 50, 100, 150, 200, float('inf')]
+    labels = [0, 1, 2, 3, 4, 5]
+    # Apply the bins and labels to the description column
+    # Create description_bins column
+    listings['description_bins'] = pd.cut(listings['description'], bins=bins, labels=labels, include_lowest=True)
+    listings['description'] = listings['description_bins']
 
     ### neighborhood_overview
+    # Replace non-null values with 1
+    listings['neighborhood_overview_bins'] = listings['neighborhood_overview'].notnull().astype(int)
+    # Replace null values with 0
+    listings['neighborhood_overview_bins'].fillna(0, inplace=True)
+    listings['neighborhood_overview'] = listings['neighborhood_overview_bins']
 
     ### host_since
+    # Convert 'host_since' column to datetime
+    listings['host_since'] = pd.to_datetime(listings['host_since'], format='%Y.%m.%d')
+    # Calculate time difference from today
+    today = datetime.today()
+    listings['time_difference'] = (today - listings['host_since']).dt.days
+    # Convert time difference to years
+    listings['years_from_today'] = listings['time_difference'] / 365
+    # Create bins
+    listings['host_since_bins'] = pd.cut(listings['years_from_today'], bins=[-float("inf"), 1, float("inf")], labels=[0, 1])
+    # Drop intermediate columns if needed
+    listings.drop(['time_difference', 'years_from_today'], axis=1, inplace=True)
+    listings['host_since'] = listings['host_since_bins']
 
     ### host_about
 
     ### host_response_rate
     # Convert 'host_response_rate' column to numeric
-    combined_listings['host_response_rate'] = combined_listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
+    listings['host_response_rate'] = listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
 
     ### host_is_superhost
 
