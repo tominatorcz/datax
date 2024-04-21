@@ -21,16 +21,11 @@ for file_name in os.listdir(folder_path):
 
 # Optionally, you can perform operations on the dataframes here
 # For example:
-#for df_name, df in dataframes.items():
+# for df_name, df in dataframes.items():
 #    print(f"DataFrame {df_name}:")
 #    print(df.head())
 
-
-#print('combined_calendar')
-#print(dataframes['combined_calendar']['date'].min())
-#print(dataframes['combined_calendar']['date'].max())
-
-#####COMBINE LISTINGS
+##### COMBINE LISTINGS
 def combine_listings():
     # Combine the DataFrames
     combined_listings = pd.concat([dataframes["listings_detail_6-23"], dataframes["listings_detail_9-23"], dataframes["listings_detail_12-23"]])
@@ -44,30 +39,84 @@ def combine_listings():
     # Reset the index after dropping duplicates
     combined_listings = combined_listings.reset_index(drop=True)
 
+    # Feature selection and dropping obsolete columns
+    include_columns = ['id', 'description', 'neighborhood_overview', 'host_since', 'host_about', 'host_response_rate',
+                       'host_is_superhost', 'host_total_listings_count', 'host_has_profile_pic', 'host_identity_verified',
+                       'neighbourhood_cleansed', 'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds',
+                       'amenities', 'number_of_reviews', 'review_scores_rating', 'instant_bookable']
+    columns_to_drop = [col for col in combined_listings.columns if col not in include_columns]
+    combined_listings = combined_listings.drop(columns=columns_to_drop)
+
     return combined_listings
 
-# Save the combined DataFrame to a new CSV file
-# combine_listings().to_csv('../data/merged_listings.csv', index=False)
+##### TRANSFORM LISTINGS
+def listings_transformation():
+    combined_listings = combine_listings()
 
-#####COMBINE CALENDARS
+    ### description
+
+    ### neighborhood_overview
+
+    ### host_since
+
+    ### host_about
+
+    ### host_response_rate
+    # Convert 'host_response_rate' column to numeric
+    combined_listings['host_response_rate'] = combined_listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
+
+    ### host_is_superhost
+
+    ### host_total_listings_count
+
+    ### host_has_profile_pic
+
+    ### host_identity_verified
+
+    ### bathrooms_text
+    # Fill empty values in the 'bathrooms_text' column with '1'
+    combined_listings['bathrooms_text'] = combined_listings['bathrooms_text'].fillna('1')
+    # Replace "Half-bath" with "0.5" in the 'bathrooms_text' column
+    combined_listings['bathrooms_text'] = combined_listings['bathrooms_text'].replace("Half-bath", "0.5")
+    combined_listings['bathrooms_text'] = combined_listings['bathrooms_text'].replace("Private half-bath", "0.5")
+    combined_listings['bathrooms_text'] = combined_listings['bathrooms_text'].replace("Shared half-bath", "0.5 shared")
+    # Function to extract the number from the 'bathrooms_text' column
+    combined_listings['bathrooms'] = combined_listings['bathrooms_text'].apply(lambda x: float(x.split()[0]) if pd.notnull(x) else None)
+    # Create the 'bathrooms_shared' column
+    combined_listings['bathrooms_shared'] = combined_listings['bathrooms_text'].str.contains('shared').astype(int)
+
+    ### bedrooms
+
+    ### beds
+
+    ### amenities
+
+    ### instant_bookable
+
+
+    return combined_listings
+
+##### COMBINE CALENDARS
 def combine_calendar():
     # Filter records up to 16.9.2023
     calendar_6_23_filtered = dataframes["calendar_6-23"][dataframes["calendar_6-23"]['date'] <= '2023-09-16']
 
-    # Filter records up to 19.12.2023
-    calendar_9_23_filtered = dataframes["calendar_9-23"][dataframes["calendar_9-23"]['date'] <= '2023-12-19']
-
     # Concatenate all filtered dataframes with ignoring index
-    combined_calendar = pd.concat([calendar_6_23_filtered, calendar_9_23_filtered, dataframes["calendar_12-23"]], ignore_index=True)
+    combined_calendar = pd.concat([calendar_6_23_filtered, dataframes["calendar_9-23"]], ignore_index=True)
 
     # Sort the DataFrame first by 'listing_id' and then by 'date'
     combined_calendar.sort_values(by=['listing_id', 'date'], inplace=True)
 
     return combined_calendar
 
-
+##### JOIN LISTINGS TO CALENDAR
 def combine_calendar_listings():
-    combined_calendar_listings = pd.merge(combine_calendar(), combine_listings(), how='left', left_on='listing_id', right_on='id')
+    combined_listings = listings_transformation()
+    combined_calendar = combine_calendar()
+    # Select only the first 100 rows from combined_calendar
+    combined_calendar_head = combined_calendar.head(500)
+    
+    combined_calendar_listings = pd.merge(combined_calendar_head, combined_listings, how='left', left_on='listing_id', right_on='id')
 
     return combined_calendar_listings
 

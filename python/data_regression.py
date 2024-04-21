@@ -23,34 +23,7 @@ categorical_columns = listings.select_dtypes(include=['object']).columns
 # Impute missing values for numerical columns with mean
 listings[numeric_columns] = listings[numeric_columns].fillna(listings[numeric_columns].mean())
 
-# Feature selection and dropping obsolete columns
-exclude_columns = ['id', 'listing_url', 'scrape_id', 'last_scraped', 'source', 'name', 'description', 'neighborhood_overview', 
-                   'neighbourhood', 'picture_url', 'host_url', 'host_acceptance_rate',
-                   'host_thumbnail_url', 'host_picture_url', 'neighbourhood_group_cleansed', 
-                   'latitude', 'longtitude', 'calendar_updated'
-                   'has_availability', 'reviews_per_month', 'amenities', 'license']
-columns_to_drop = [col for col in exclude_columns if col in listings.columns]
-listings = listings.drop(columns=columns_to_drop)
 
-###### Data transformation --->:
-
-# Convert 'price' column to numeric
-listings['price'] = listings['price'].replace('[\$,]', '', regex=True).astype(float)
-
-# Convert 'host_response_rate' column to numeric
-listings['host_response_rate'] = listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
-
-# Bathroom needs to be ajdusted
-# Fill empty values in the 'bathrooms_text' column with '1'
-listings['bathrooms_text'] = listings['bathrooms_text'].fillna('1')
-# Replace "Half-bath" with "0.5" in the 'bathrooms_text' column
-listings['bathrooms_text'] = listings['bathrooms_text'].replace("Half-bath", "0.5")
-listings['bathrooms_text'] = listings['bathrooms_text'].replace("Private half-bath", "0.5")
-listings['bathrooms_text'] = listings['bathrooms_text'].replace("Shared half-bath", "0.5 shared")
-# Function to extract the number from the 'bathrooms_text' column
-listings['bathrooms'] = listings['bathrooms_text'].apply(lambda x: float(x.split()[0]) if pd.notnull(x) else None)
-# Create the 'bathrooms_shared' column
-listings['bathrooms_shared'] = listings['bathrooms_text'].str.contains('shared').astype(int)
 
 ###### Data encoding --->:
 # Encoding categorical variables
