@@ -83,7 +83,12 @@ def listings_transformation():
     listings['host_since'] = listings['host_since_bins']
 
     ### host_about
-
+    # Replace non-null values with 1
+    listings['host_about_bins'] = listings['host_about'].notnull().astype(int)
+    # Replace null values with 0
+    listings['host_about_bins'].fillna(0, inplace=True)
+    listings['host_about'] = listings['host_about_bins']
+    
     ### host_response_rate
     # Convert 'host_response_rate' column to numeric
     listings['host_response_rate'] = listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
