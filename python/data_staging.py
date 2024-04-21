@@ -3,7 +3,6 @@ import pandas as pd # used for working with data sets
 import numpy as np # used for working with arrays
 import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
-import glob
 
 import os
 
@@ -15,7 +14,7 @@ dataframes = {}
 
 # Loop through each file in the folder, load it into a dataframe, and store it in the dictionary
 for file_name in os.listdir(folder_path):
-    if file_name.endswith('.csv'):
+    if file_name != 'combined.csv' and file_name.endswith('.csv'):
         file_path = os.path.join(folder_path, file_name)
         df_name = os.path.splitext(file_name)[0]  # Extract the filename without extension
         dataframes[df_name] = pd.read_csv(file_path)
@@ -30,7 +29,6 @@ for file_name in os.listdir(folder_path):
 #print('combined_calendar')
 #print(dataframes['combined_calendar']['date'].min())
 #print(dataframes['combined_calendar']['date'].max())
-
 
 #####COMBINE LISTINGS
 def combine_listings():
@@ -49,11 +47,9 @@ def combine_listings():
     return combined_listings
 
 # Save the combined DataFrame to a new CSV file
-combine_listings().to_csv('../data/merged_listings.csv', index=False)
+# combine_listings().to_csv('../data/merged_listings.csv', index=False)
 
 #####COMBINE CALENDARS
-import pandas as pd
-
 def combine_calendar():
     # Filter records up to 16.9.2023
     calendar_6_23_filtered = dataframes["calendar_6-23"][dataframes["calendar_6-23"]['date'] <= '2023-09-16']
@@ -69,6 +65,16 @@ def combine_calendar():
 
     return combined_calendar
 
+
+def combine_calendar_listings():
+    combined_calendar_listings = pd.merge(combine_calendar(), combine_listings(), how='left', left_on='listing_id', right_on='id')
+
+    return combined_calendar_listings
+
+
+combine_calendar_listings().to_csv("../data/combined.csv", index=False)
+
+
 # Save the merged data to a CSV file
-combine_calendar().to_csv("../data/merged_calendar.csv", index=False)
+#combine_calendar().to_csv("../data/merged_calendar.csv", index=False)
 
