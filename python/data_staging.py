@@ -102,9 +102,16 @@ def listings_transformation():
 
     ### host_total_listings_count
 
+
     ### host_has_profile_pic
+    # Create boolean column, t=1, f=0
+    listings['host_has_profile_pic_bool'] = listings['host_has_profile_pic'].map({'t': 1, 'f': 0})
+    listings['host_has_profile_pic'] = listings['host_has_profile_pic_bool']
 
     ### host_identity_verified
+    # Create boolean column, t=1, f=0
+    listings['host_identity_verified_bool'] = listings['host_identity_verified'].map({'t': 1, 'f': 0})
+    listings['host_identity_verified'] = listings['host_identity_verified_bool']
 
     ### bathrooms_text
     # Fill empty values with '1'
@@ -119,13 +126,19 @@ def listings_transformation():
     listings['bathrooms_shared_bool'] = listings['bathrooms_text'].str.contains('shared').astype(int)
 
     ### bedrooms
+    # Fill empty values with '1'
+    listings['bedrooms'] = listings['bedrooms'].fillna(1)
 
     ### beds
-
+    # Fill empty values with '1'
+    listings['beds'] = listings['beds'].fillna(1)
+    
     ### amenities
 
     ### instant_bookable
-
+    # Create boolean column, t=1, f=0
+    listings['instant_bookable_bool'] = listings['instant_bookable'].map({'t': 1, 'f': 0})
+    listings['instant_bookable'] = listings['instant_bookable_bool']
 
     return listings
 
