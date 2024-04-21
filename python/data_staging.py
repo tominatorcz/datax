@@ -23,26 +23,26 @@ for file_name in os.listdir(folder_path):
 ##### COMBINE LISTINGS
 def combine_listings():
     # Combine the DataFrames
-    combined_listings = pd.concat([dataframes["listings_detail_6-23"], dataframes["listings_detail_9-23"]])
+    listings = pd.concat([dataframes["listings_detail_6-23"], dataframes["listings_detail_9-23"]])
     
     # Sort by 'last_scraped' column in descending order to ensure the newest entries are on top
-    combined_listings = combined_listings.sort_values(by='last_scraped', ascending=False)
+    listings = listings.sort_values(by='last_scraped', ascending=False)
     
     # Remove duplicates based on 'listing_id', keeping the first occurrence (which will be the newest one due to sorting)
-    combined_listings = combined_listings.drop_duplicates(subset='id', keep='first')
+    listings = listings.drop_duplicates(subset='id', keep='first')
     
     # Reset the index after dropping duplicates
-    combined_listings = combined_listings.reset_index(drop=True)
+    listings = listings.reset_index(drop=True)
 
     # Feature selection and dropping obsolete columns
     include_columns = ['id', 'description', 'neighborhood_overview', 'host_since', 'host_about', 'host_response_rate',
                        'host_is_superhost', 'host_total_listings_count', 'host_has_profile_pic', 'host_identity_verified',
                        'neighbourhood_cleansed', 'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds',
                        'amenities', 'number_of_reviews', 'review_scores_rating', 'instant_bookable']
-    columns_to_drop = [col for col in combined_listings.columns if col not in include_columns]
-    combined_listings = combined_listings.drop(columns=columns_to_drop)
+    columns_to_drop = [col for col in listings.columns if col not in include_columns]
+    listings = listings.drop(columns=columns_to_drop)
 
-    return combined_listings
+    return listings
 
 ##### TRANSFORM LISTINGS
 def listings_transformation():
@@ -89,6 +89,10 @@ def listings_transformation():
     listings['host_response_rate'] = listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
 
     ### host_is_superhost
+    # Fill empty values with "f"
+    listings['host_is_superhost'].fillna(value='f', inplace=True)
+    # Create boolean column, t=1, f=0
+    listings['host_is_superhost_bool'] = listings['host_is_superhost'].map({'t': 1, 'f': 0})
 
     ### host_total_listings_count
 
@@ -98,15 +102,15 @@ def listings_transformation():
 
     ### bathrooms_text
     # Fill empty values in the 'bathrooms_text' column with '1'
-    combined_listings['bathrooms_text'] = combined_listings['bathrooms_text'].fillna('1')
+    listings['bathrooms_text'] = listings['bathrooms_text'].fillna('1')
     # Replace "Half-bath" with "0.5" in the 'bathrooms_text' column
-    combined_listings['bathrooms_text'] = combined_listings['bathrooms_text'].replace("Half-bath", "0.5")
-    combined_listings['bathrooms_text'] = combined_listings['bathrooms_text'].replace("Private half-bath", "0.5")
-    combined_listings['bathrooms_text'] = combined_listings['bathrooms_text'].replace("Shared half-bath", "0.5 shared")
+    listings['bathrooms_text'] = listings['bathrooms_text'].replace("Half-bath", "0.5")
+    listings['bathrooms_text'] = listings['bathrooms_text'].replace("Private half-bath", "0.5")
+    listings['bathrooms_text'] = listings['bathrooms_text'].replace("Shared half-bath", "0.5 shared")
     # Function to extract the number from the 'bathrooms_text' column
-    combined_listings['bathrooms'] = combined_listings['bathrooms_text'].apply(lambda x: float(x.split()[0]) if pd.notnull(x) else None)
+    listings['bathrooms'] = listings['bathrooms_text'].apply(lambda x: float(x.split()[0]) if pd.notnull(x) else None)
     # Create the 'bathrooms_shared' column
-    combined_listings['bathrooms_shared'] = combined_listings['bathrooms_text'].str.contains('shared').astype(int)
+    listings['bathrooms_shared'] = listings['bathrooms_text'].str.contains('shared').astype(int)
 
     ### bedrooms
 
@@ -117,7 +121,7 @@ def listings_transformation():
     ### instant_bookable
 
 
-    return combined_listings
+    return listings
 
 ##### COMBINE CALENDARS
 def combine_calendar():
@@ -134,12 +138,12 @@ def combine_calendar():
 
 ##### JOIN LISTINGS TO CALENDAR
 def combine_calendar_listings():
-    combined_listings = listings_transformation()
+    listings = listings_transformation()
     combined_calendar = combine_calendar()
     # Select only the first 100 rows from combined_calendar
     combined_calendar_head = combined_calendar.head(500)
     
-    combined_calendar_listings = pd.merge(combined_calendar_head, combined_listings, how='left', left_on='listing_id', right_on='id')
+    combined_calendar_listings = pd.merge(combined_calendar_head, listings, how='left', left_on='listing_id', right_on='id')
 
     return combined_calendar_listings
 
