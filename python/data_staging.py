@@ -160,6 +160,11 @@ def combine_calendar():
 
     return combined_calendar
 
+def listings_transformation():
+    calendars = combine_calendar()
+
+    return calendars
+
 ##### JOIN LISTINGS TO CALENDAR
 def combine_calendar_listings():
     combined_listings = listings_transformation()
@@ -170,7 +175,6 @@ def combine_calendar_listings():
     combined_calendar_listings = pd.merge(combined_calendar_head, combined_listings, how='left', left_on='listing_id', right_on='id')
 
     return combined_calendar_listings
-
 
 
 combine_calendar_listings().to_csv("../data/combined.csv", index=False)

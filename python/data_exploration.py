@@ -98,3 +98,5 @@ summary_df = pd.DataFrame(summary_table, columns=["Column", "Data Type", "Non-nu
 
 # Output the summary to a CSV file
 summary_df.to_csv('summary.csv', index=False)
+
+
