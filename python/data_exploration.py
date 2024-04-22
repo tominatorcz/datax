@@ -6,7 +6,7 @@ import seaborn as sns # used for plotting, see examples at https://seaborn.pydat
 import glob
 
 # Read the combined CSV file into a DataFrame
-listings = pd.read_csv(r"..\data\combined.csv")
+listings = pd.read_csv(r"..\data\listings_detail_9-23.csv")
 
 
 ##############################################DATA EXPLORATION#############################################
@@ -32,6 +32,7 @@ listings.size
 
 ############ DESCRIBE COLUMN ##############
 # Define function to describe each column
+"""Tomi funkce:
 def describe_column(column):
     print(f"Column: {column}")
     print(f"Variable type: {listings[column].dtype}")
@@ -60,6 +61,33 @@ def describe_column(column):
         #plt.show()
     
     print("\n")
+"""
+def describe_column(column):
+    print(f"Column: {column}")
+    print(f"Variable type: {listings[column].dtype}")
+    print(f"Number of non-null values: {listings[column].notnull().sum()}")
+    print(f"Number of missing values: {listings[column].isnull().sum()}")
+    print(f"Number of unique values: {listings[column].nunique()}")
+    
+    if listings[column].dtype == 'object':
+        print(f"Type of values: Categorical")
+        print(f"Sample values: {listings[column].sample(5).tolist()}")
+    else:
+        print(f"Type of values: Numerical")
+        print(f"Minimum value: {listings[column].min()}")
+        print(f"Maximum value: {listings[column].max()}")
+        print(f"Mean value: {listings[column].mean()}")
+        print(f"Standard deviation: {listings[column].std()}")
+        
+        # Detect and handle outliers (you might need to customize this part based on your definition of outliers)
+        Q1 = listings[column].quantile(0.05)
+        Q3 = listings[column].quantile(0.95)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        outliers = (listings[column] < lower_bound) | (listings[column] > upper_bound)
+        print(f"Number of outliers: {outliers.sum()}")
+
 
 # Describe each column in the dataset
 #numeric_columns = listings.select_dtypes(include=['int64', 'float64']).columns
@@ -73,6 +101,7 @@ describe_column('last_scraped')
 
 ########## SUMARIZE COLUMN ##############
 # Function to summarize each column
+"""Tomi code
 def summarize_column(column):
     data_type = listings[column].dtype
     non_null_count = listings[column].notnull().sum()
@@ -84,6 +113,40 @@ def summarize_column(column):
     
     summary = [column, data_type, non_null_count, unique_count, min_value, max_value, mean_value, std_dev]
     return summary
+"""
+def summarize_column(column):
+    data_type = listings[column].dtype
+    non_null_count = listings[column].notnull().sum()
+    missing_count = listings[column].isnull().sum()  # Count of missing values
+    unique_count = listings[column].nunique()
+    
+    if data_type in ['int64', 'float64']:
+        min_value = listings[column].min()
+        max_value = listings[column].max()
+        mean_value = listings[column].mean()
+        std_dev = listings[column].std()
+        
+        # Outlier detection
+        Q1 = listings[column].quantile(0.05)
+        Q3 = listings[column].quantile(0.95)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        outliers = (listings[column] < lower_bound) | (listings[column] > upper_bound)
+        outlier_count = outliers.sum()
+        
+        summary = [column, data_type, non_null_count, missing_count, unique_count, min_value, max_value, mean_value, std_dev, outlier_count]
+    else:
+        min_value = None
+        max_value = None
+        mean_value = None
+        std_dev = None
+        outlier_count = None
+        
+        summary = [column, data_type, non_null_count, missing_count, unique_count, min_value, max_value, mean_value, std_dev]
+    
+    return summary
+
 
 # List of columns to summarize
 columns_to_summarize = listings.columns
@@ -94,7 +157,7 @@ for column in columns_to_summarize:
     summary_table.append(summarize_column(column))
 
 # Create a DataFrame from the summary
-summary_df = pd.DataFrame(summary_table, columns=["Column", "Data Type", "Non-null Count", "Unique Count", "Min Value", "Max Value", "Mean Value", "Standard Deviation"])
+summary_df = pd.DataFrame(summary_table, columns=["Column", "Data Type", "Non-null Count", "Missing Count", "Unique Count", "Min Value", "Max Value", "Mean Value", "Standard Deviation", "Outlier Count"])
 
 # Output the summary to a CSV file
 summary_df.to_csv('summary.csv', index=False)
