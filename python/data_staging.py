@@ -36,9 +36,9 @@ def combine_listings():
 
     # Feature selection and dropping obsolete columns
     include_columns = ['id', 'description', 'neighborhood_overview', 'host_since', 'host_about', 'host_response_rate',
-                       'host_is_superhost', 'host_total_listings_count', 'host_has_profile_pic', 'host_identity_verified',
-                       'neighbourhood_cleansed', 'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds',
-                       'amenities', 'number_of_reviews', 'review_scores_rating', 'instant_bookable']
+                       'host_is_superhost', 'host_has_profile_pic', 'host_identity_verified','neighbourhood_cleansed',
+                       'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds', 'amenities', 
+                       'number_of_reviews', 'review_scores_rating', 'instant_bookable']
     columns_to_drop = [col for col in listings.columns if col not in include_columns]
     listings = listings.drop(columns=columns_to_drop)
 
@@ -92,6 +92,14 @@ def listings_transformation():
     ### host_response_rate
     # Convert 'host_response_rate' column to numeric
     listings['host_response_rate'] = listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
+    # Replace 'N/A' and '0' with 0
+    listings['host_response_rate'] = listings['host_response_rate'].replace(["N/A", "0"], 0)
+    # Define bin edges and labels
+    bin_edges = [-float("inf"), 50, 90, float("inf")]
+    bin_labels = [0, 1, 2]
+    # Create bins
+    listings['response_rate_bins'] = pd.cut(listings['host_response_rate'], bins=bin_edges, labels=bin_labels, right=False)
+    listings['host_response_rate'] = listings['response_rate_bins']
 
     ### host_is_superhost
     # Fill empty values with "f"
@@ -99,8 +107,6 @@ def listings_transformation():
     # Create boolean column, t=1, f=0
     listings['host_is_superhost_bool'] = listings['host_is_superhost'].map({'t': 1, 'f': 0})
     listings['host_is_superhost'] = listings['host_is_superhost_bool']
-
-    ### host_total_listings_count
 
     ### host_has_profile_pic
 
