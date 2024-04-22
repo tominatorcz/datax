@@ -39,8 +39,8 @@ def combine_listings():
                        'host_is_superhost', 'host_has_profile_pic', 'host_identity_verified','neighbourhood_cleansed',
                        'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds', 'amenities', 
                        'number_of_reviews', 'review_scores_rating', 'instant_bookable']
-    columns_to_drop = [col for col in listings.columns if col not in include_columns]
-    listings = listings.drop(columns=columns_to_drop)
+    columns_to_drop = [col for col in combined_listings.columns if col not in include_columns]
+    combined_listings = combined_listings.drop(columns=columns_to_drop)
 
     return combined_listings
 
@@ -70,7 +70,7 @@ def listings_transformation():
 
     ### host_since
     # Convert 'host_since' column to datetime
-    listings['host_since'] = pd.to_datetime(listings['host_since'], format='%Y.%m.%d')
+    listings['host_since'] = pd.to_datetime(listings['host_since'], format='%Y-%m-%d')
     # Calculate time difference from today
     today = datetime.today()
     listings['time_difference'] = (today - listings['host_since']).dt.days
@@ -165,11 +165,12 @@ def combine_calendar_listings():
     combined_listings = listings_transformation()
     combined_calendar = combine_calendar()
     # Select only the first 100 rows from combined_calendar
-    combined_calendar_head = combined_calendar.head(500)
+    combined_calendar_head = combined_calendar.head(200000)
     
     combined_calendar_listings = pd.merge(combined_calendar_head, combined_listings, how='left', left_on='listing_id', right_on='id')
 
     return combined_calendar_listings
+
 
 
 combine_calendar_listings().to_csv("../data/combined.csv", index=False)
