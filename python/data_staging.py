@@ -36,9 +36,10 @@ def combine_listings():
     combined_listings = combined_listings.reset_index(drop=True)
 
     # Feature selection and dropping obsolete columns
+    # !amenities removed
     include_columns = ['id', 'description', 'neighborhood_overview', 'host_since', 'host_about', 'host_response_rate',
                        'host_is_superhost', 'host_has_profile_pic', 'host_identity_verified','neighbourhood_cleansed',
-                       'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds', 'amenities', 
+                       'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds', 
                        'number_of_reviews', 'review_scores_rating', 'instant_bookable']
     columns_to_drop = [col for col in combined_listings.columns if col not in include_columns]
     combined_listings = combined_listings.drop(columns=columns_to_drop)
