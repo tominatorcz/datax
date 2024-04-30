@@ -1,5 +1,6 @@
 ### Dependencies ----------------------------------------------------------------
 import pandas as pd # used for working with data sets
+import ast
 import numpy as np # used for working with arrays
 import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
@@ -35,9 +36,10 @@ def combine_listings():
     combined_listings = combined_listings.reset_index(drop=True)
 
     # Feature selection and dropping obsolete columns
+    # !amenities removed
     include_columns = ['id', 'description', 'neighborhood_overview', 'host_since', 'host_about', 'host_response_rate',
                        'host_is_superhost', 'host_has_profile_pic', 'host_identity_verified','neighbourhood_cleansed',
-                       'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds', 'amenities', 
+                       'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds', 
                        'number_of_reviews', 'review_scores_rating', 'instant_bookable']
     columns_to_drop = [col for col in combined_listings.columns if col not in include_columns]
     combined_listings = combined_listings.drop(columns=columns_to_drop)
@@ -67,6 +69,71 @@ def listings_transformation():
     # Replace null values with 0
     listings['neighborhood_overview_bins'].fillna(0, inplace=True)
     listings['neighborhood_overview'] = listings['neighborhood_overview_bins']
+
+    ### neighbourhood_cleansed
+    # Define the mapping dictionary
+    mapping_dict = {
+    'Běchovice': 'Prague-outskirts',
+    'Benice': 'Prague-outskirts',
+    'Březiněves': 'Prague-outskirts',
+    'Čakovice': 'Prague-outskirts',
+    'Ďáblice': 'Prague-outskirts',
+    'Dolní Chabry': 'Prague-outskirts',
+    'Dolní Měcholupy': 'Prague-outskirts',
+    'Dolní Počernice': 'Prague-outskirts',
+    'Dubeč': 'Prague-outskirts',
+    'Klánovice': 'Prague-outskirts',
+    'Koloděje': 'Prague-outskirts',
+    'Kolovraty': 'Prague-outskirts',
+    'Královice': 'Prague-outskirts',
+    'Křeslice': 'Prague-outskirts',
+    'Kunratice': 'Prague-outskirts',
+    'Libuš': 'Prague-outskirts',
+    'Lipence': 'Prague-outskirts',
+    'Lochkov': 'Prague-outskirts',
+    'Lysolaje': 'Prague-outskirts',
+    'Nebušice': 'Prague-outskirts',
+    'Nedvězí': 'Prague-outskirts',
+    'Petrovice': 'Prague-outskirts',
+    'Praha 1': 'Prague-center',
+    'Praha 10': 'Prague',
+    'Praha 11': 'Prague',
+    'Praha 12': 'Prague-outskirts',
+    'Praha 13': 'Prague-outskirts',
+    'Praha 14': 'Prague',
+    'Praha 15': 'Prague-outskirts',
+    'Praha 16': 'Prague-outskirts',
+    'Praha 17': 'Prague-outskirts',
+    'Praha 18': 'Prague',
+    'Praha 19': 'Prague-outskirts',
+    'Praha 2': 'Prague-center',
+    'Praha 20': 'Prague-outskirts',
+    'Praha 21': 'Prague-outskirts',
+    'Praha 22': 'Prague-outskirts',
+    'Praha 3': 'Prague',
+    'Praha 4': 'Prague',
+    'Praha 5': 'Prague',
+    'Praha 6': 'Prague',
+    'Praha 7': 'Prague',
+    'Praha 8': 'Prague',
+    'Praha 9': 'Prague',
+    'Přední Kopanina': 'Prague-outskirts',
+    'Řeporyje': 'Prague-outskirts',
+    'Satalice': 'Prague-outskirts',
+    'Šeberov': 'Prague-outskirts',
+    'Slivenec': 'Prague-outskirts',
+    'Štěrboholy': 'Prague-outskirts',
+    'Suchdol': 'Prague-outskirts',
+    'Troja': 'Prague-outskirts',
+    'Újezd': 'Prague-outskirts',
+    'Velká Chuchle': 'Prague-outskirts',
+    'Vinoř': 'Prague-outskirts',
+    'Zbraslav': 'Prague-outskirts',
+    'Zličín': 'Prague-outskirts'
+    }
+    # Map the group to neighourhoods
+    listings['neighbourhood_group'] = listings['neighbourhood_cleansed'].map(mapping_dict)
+    listings['neighbourhood_cleansed'] = listings['neighbourhood_group']
 
     ### host_since
     # Convert 'host_since' column to datetime
@@ -107,6 +174,7 @@ def listings_transformation():
     # Create boolean column, t=1, f=0
     listings['host_is_superhost_bool'] = listings['host_is_superhost'].map({'t': 1, 'f': 0})
     listings['host_is_superhost'] = listings['host_is_superhost_bool']
+    listings['host_is_superhost']
 
     ### host_has_profile_pic
     # Create boolean column, t=1, f=0
@@ -127,6 +195,7 @@ def listings_transformation():
     listings['bathrooms_text'] = listings['bathrooms_text'].replace("Shared half-bath", "0.5 shared")
     # Function to extract the number from the 'bathrooms_text' column
     listings['bathrooms_num'] = listings['bathrooms_text'].apply(lambda x: float(x.split()[0]) if pd.notnull(x) else None)
+    listings['bathrooms_num']
     # Create the 'bathrooms_shared' column
     listings['bathrooms_shared_bool'] = listings['bathrooms_text'].str.contains('shared').astype(int)
 
@@ -138,7 +207,23 @@ def listings_transformation():
     # Fill empty values with '1'
     listings['beds'] = listings['beds'].fillna(1)
     
-    ### amenities
+    ### amenities - too many individual values
+    """# Convert string representation of list to actual list
+    listings['amenities'] = listings['amenities'].apply(ast.literal_eval)
+    # Convert each cell in the 'amenities' column to a list and flatten all lists
+    all_amenities = [item for sublist in listings['amenities'] for item in sublist]
+    all_amenities
+    listings['amenities'] 
+    # Remove duplicates by converting to a set
+    unique_amenities = set(all_amenities)
+    # Convert back to a list if needed
+    unique_amenities_list = list(unique_amenities)
+    print(unique_amenities_list)
+    # Create a dataframe from the unique amenities list
+    amenities_df = pd.DataFrame(unique_amenities_list, columns=['Amenity'])
+    # Write the dataframe to a CSV file with encoding specified
+    amenities_df.to_csv('unique_amenities.csv', index=False, encoding='utf-8')"""
+
 
     ### instant_bookable
     # Create boolean column, t=1, f=0
@@ -158,12 +243,13 @@ def combine_calendar():
     # Sort the DataFrame first by 'listing_id' and then by 'date'
     combined_calendar.sort_values(by=['listing_id', 'date'], inplace=True)
 
+    # Feature selection and dropping obsolete columns
+    include_columns_cal = ['listing_id', 'date', 'price']
+    columns_to_drop_cal = [col for col in combined_calendar.columns if col not in include_columns_cal]
+    combined_calendar = combined_calendar.drop(columns=columns_to_drop_cal)
+
     return combined_calendar
 
-def listings_transformation():
-    calendars = combine_calendar()
-
-    return calendars
 
 ##### JOIN LISTINGS TO CALENDAR
 def combine_calendar_listings():
@@ -179,6 +265,7 @@ def combine_calendar_listings():
 def clean_calendar_listings():
     combined_data = combine_calendar_listings()
     combined_data.drop(columns='id')
+
 
 
 
