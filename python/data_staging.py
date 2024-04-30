@@ -176,6 +176,11 @@ def combine_calendar_listings():
 
     return combined_calendar_listings
 
+def clean_calendar_listings():
+    combined_data = combine_calendar_listings()
+    combined_data.drop(columns='id')
+
+
 
 combine_calendar_listings().to_csv("../data/combined.csv", index=False)
 
