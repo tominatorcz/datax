@@ -37,7 +37,7 @@ def combine_listings():
 
     # Feature selection and dropping obsolete columns
     # !amenities removed
-    include_columns = ['id', 'description', 'neighborhood_overview', 'host_since', 'host_about', 'host_response_rate',
+    include_columns = ['id', 'description', 'neighborhood_overview', 'host_since', 'host_about',
                        'host_is_superhost', 'host_has_profile_pic', 'host_identity_verified','neighbourhood_cleansed',
                        'room_type', 'accommodates', 'bathrooms_text', 'bedrooms', 'beds', 
                        'number_of_reviews', 'review_scores_rating', 'instant_bookable']
@@ -157,16 +157,18 @@ def listings_transformation():
     listings['host_about'] = listings['host_about_bins']
     
     ### host_response_rate
-    # Convert 'host_response_rate' column to numeric
-    listings['host_response_rate'] = listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
-    # Replace 'N/A' and '0' with 0
-    listings['host_response_rate'] = listings['host_response_rate'].replace(["N/A", "0"], 0)
-    # Define bin edges and labels
-    bin_edges = [-float("inf"), 50, 90, float("inf")]
-    bin_labels = [0, 1, 2]
-    # Create bins
-    listings['response_rate_bins'] = pd.cut(listings['host_response_rate'], bins=bin_edges, labels=bin_labels, right=False)
-    listings['host_response_rate'] = listings['response_rate_bins']
+    ## Convert 'host_response_rate' column to numeric
+    #listings['host_response_rate'] = listings['host_response_rate'].replace('[\%,]', '', regex=True).astype(float)
+    ## Convert 'host_response_rate' float
+    #listings['host_response_rate'] = listings['host_response_rate'].replace(',', '.').astype(float)
+    ## Replace 'N/A' and '0' with 0
+    #listings['host_response_rate'] = listings['host_response_rate'].replace(["N/A", "0"], 0)
+    ## Define bin edges and labels
+    #bin_edges = [-float("inf"), 0.50, 0.90, float("inf")]
+    #bin_labels = [0, 1, 2]
+    ## Create bins
+    #listings['response_rate_bins'] = pd.cut(listings['host_response_rate'], bins=bin_edges, labels=bin_labels, right=False)
+    #listings['host_response_rate'] = listings['response_rate_bins']
 
     ### host_is_superhost
     # Fill empty values with "f"
@@ -174,7 +176,6 @@ def listings_transformation():
     # Create boolean column, t=1, f=0
     listings['host_is_superhost_bool'] = listings['host_is_superhost'].map({'t': 1, 'f': 0})
     listings['host_is_superhost'] = listings['host_is_superhost_bool']
-    listings['host_is_superhost']
 
     ### host_has_profile_pic
     # Create boolean column, t=1, f=0
@@ -248,6 +249,14 @@ def combine_calendar():
     columns_to_drop_cal = [col for col in combined_calendar.columns if col not in include_columns_cal]
     combined_calendar = combined_calendar.drop(columns=columns_to_drop_cal)
 
+    ## Clean the price column
+    # Remove '$'
+    combined_calendar['price'] = combined_calendar['price'].str.replace('$', '')
+    # Remove commas  
+    combined_calendar['price'] = combined_calendar['price'].str.replace(',', '')
+    # Convert to float (or int if needed)
+    combined_calendar['price'] = combined_calendar['price'].astype(float)    
+
     return combined_calendar
 
 
@@ -255,23 +264,35 @@ def combine_calendar():
 def combine_calendar_listings():
     combined_listings = listings_transformation()
     combined_calendar = combine_calendar()
+
     # Select only the first 100 rows from combined_calendar
-    combined_calendar_head = combined_calendar.head(200000)
+    #combined_calendar_head = combined_calendar.head(200000)
     
-    combined_calendar_listings = pd.merge(combined_calendar_head, combined_listings, how='left', left_on='listing_id', right_on='id')
+    combined_calendar_listings = pd.merge(combined_calendar, combined_listings, how='left', left_on='listing_id', right_on='id')
 
     return combined_calendar_listings
 
+##### CLEAN COMBINED FILE
 def clean_calendar_listings():
     combined_data = combine_calendar_listings()
-    combined_data.drop(columns='id')
+    clean_combined_data = combined_data.drop(columns=['listing_id', 'id', 'description_bins', 
+                                                      'neighborhood_overview_bins', 'neighbourhood_group', 
+                                                      'host_about_bins', 'host_is_superhost_bool', 
+                                                      'host_has_profile_pic_bool', 'host_identity_verified_bool',
+                                                      'bathrooms_text', 'instant_bookable_bool'])
+    # Convert date column to datetime type
+    clean_combined_data['date'] = pd.to_datetime(clean_combined_data['date'])
 
+    # Sort DataFrame by the "date" column
+    clean_combined_data_sorted = clean_combined_data.sort_values(by='date')
 
+    return clean_combined_data_sorted
+    
 
+##### EXPORT FILE to PICKLE
+#clean_calendar_listings().to_pickle('../data/combined.pickle')
 
-combine_calendar_listings().to_csv("../data/combined.csv", index=False)
+##### EXPORT FILE to CSV
+clean_calendar_listings().to_csv("../data/combined.csv", index=False)
 
-
-# Save the merged data to a CSV file
-#combine_calendar().to_csv("../data/merged_calendar.csv", index=False)
 
