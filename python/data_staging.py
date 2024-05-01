@@ -5,11 +5,14 @@ import numpy as np # used for working with arrays
 import matplotlib.pyplot as plt # used for plotting
 import seaborn as sns # used for plotting, see examples at https://seaborn.pydata.org/examples/index.html
 from datetime import datetime
+from transformers import pipeline
+import time
 
 import os
 
 # Define the path to your folder containing the CSV files
 folder_path = '../data'
+# folder_path = 'data'
 
 # Create an empty dictionary to store your dataframes
 dataframes = {}
@@ -255,9 +258,25 @@ def combine_calendar():
     # Remove commas  
     combined_calendar['price'] = combined_calendar['price'].str.replace(',', '')
     # Convert to float (or int if needed)
-    combined_calendar['price'] = combined_calendar['price'].astype(float)    
+    combined_calendar['price'] = combined_calendar['price'].astype(float)
+    
+    combined_calendar['date'] = pd.to_datetime(combined_calendar['date'])
+    
+    # Adding columns for following group by operations
+    combined_calendar['year'] = combined_calendar['date'].dt.year
+    combined_calendar['month'] = combined_calendar['date'].dt.month
+    
+    # Group by 'listing_id', 'year', and 'month' and calculate the average of the 'price'
+    grouped_calendar = combined_calendar.groupby(['listing_id', 'year', 'month'])['price'].mean().reset_index()
 
-    return combined_calendar
+    # Rename the 'price' column to 'average_price' to reflect the aggregation
+    grouped_calendar.rename(columns={'price': 'avg_price'}, inplace=True)
+    
+    # Date column based on year and month = output is firts date in month
+    grouped_calendar['date'] = pd.to_datetime(grouped_calendar['year'].astype(str) + '-' + grouped_calendar['month'].astype(str) + '-01')
+    
+    return grouped_calendar
+
 
 
 ##### JOIN LISTINGS TO CALENDAR
@@ -268,9 +287,10 @@ def combine_calendar_listings():
     # Select only the first 100 rows from combined_calendar
     #combined_calendar_head = combined_calendar.head(200000)
     
-    combined_calendar_listings = pd.merge(combined_calendar, combined_listings, how='left', left_on='listing_id', right_on='id')
+    combined_calendar_listings = pd.merge(combined_listings, combined_calendar, how='left', left_on='id', right_on='listing_id')
 
     return combined_calendar_listings
+
 
 ##### CLEAN COMBINED FILE
 def clean_calendar_listings():
@@ -281,7 +301,7 @@ def clean_calendar_listings():
                                                       'host_has_profile_pic_bool', 'host_identity_verified_bool',
                                                       'bathrooms_text', 'instant_bookable_bool'])
     # Convert date column to datetime type
-    clean_combined_data['date'] = pd.to_datetime(clean_combined_data['date'])
+    # clean_combined_data['date'] = pd.to_datetime(clean_combined_data['date'])
 
     # Sort DataFrame by the "date" column
     clean_combined_data_sorted = clean_combined_data.sort_values(by='date')
@@ -291,6 +311,7 @@ def clean_calendar_listings():
 
 ##### EXPORT FILE to PICKLE
 #clean_calendar_listings().to_pickle('../data/combined.pickle')
+
 
 ##### EXPORT FILE to CSV
 clean_calendar_listings().to_csv("../data/combined.csv", index=False)

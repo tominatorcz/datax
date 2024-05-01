@@ -10,7 +10,8 @@ data/neighbourhoods_9-23.geojson
 data/reviews_12-23.csv
 data/reviews_6-23.csv
 data/reviews_9-23.csv
-data/combined.csv
 data/listings_detail_6-23.csv
 data/listings_detail_9-23.csv
 data/listings_detail_12-23.csv
+data/neighbourhoods.geojson
+data/neighbourhoods.csv
