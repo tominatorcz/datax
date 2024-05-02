@@ -290,8 +290,6 @@ def combine_calendar():
     
     return grouped_calendar
 
-
-
 ##### JOIN LISTINGS TO CALENDAR
 def combine_calendar_listings():
     combined_listings = listings_transformation()
@@ -303,7 +301,6 @@ def combine_calendar_listings():
     combined_calendar_listings = pd.merge(combined_listings, combined_calendar, how='left', left_on='id', right_on='listing_id')
 
     return combined_calendar_listings
-
 
 ##### CLEAN COMBINED FILE
 def clean_calendar_listings():
