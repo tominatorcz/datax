@@ -267,9 +267,7 @@ def combine_calendar():
     # Remove outliers
     mean_price = combined_calendar['price'].mean()
     std_error_price = combined_calendar['price'].sem()
-    threshold = 3 * std_error_price
-
-    # Correctly apply the filter to the entire DataFrame
+    threshold = 2 * std_error_price
     combined_calendar = combined_calendar[
         (combined_calendar['price'] >= mean_price - threshold) &
         (combined_calendar['price'] <= mean_price + threshold)
