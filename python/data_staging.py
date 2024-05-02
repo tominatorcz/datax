@@ -228,13 +228,18 @@ def listings_transformation():
     # Write the dataframe to a CSV file with encoding specified
     amenities_df.to_csv('unique_amenities.csv', index=False, encoding='utf-8')"""
 
-
     ### instant_bookable
     # Create boolean column, t=1, f=0
     listings['instant_bookable_bool'] = listings['instant_bookable'].map({'t': 1, 'f': 0})
     listings['instant_bookable'] = listings['instant_bookable_bool']
 
+    ### review_scores_rating
+    #Replace missing values with the mean of non-missing values
+    mean_rating = listings['review_scores_rating'].mean()
+    listings['review_scores_rating'] = listings['review_scores_rating'].fillna(mean_rating)
+
     return listings
+
 
 ##### COMBINE CALENDARS
 def combine_calendar():
