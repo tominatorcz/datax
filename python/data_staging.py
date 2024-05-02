@@ -259,6 +259,7 @@ def combine_calendar():
     combined_calendar['price'] = combined_calendar['price'].str.replace(',', '')
     # Convert to float (or int if needed)
     combined_calendar['price'] = combined_calendar['price'].astype(float)
+    # Remove outliers
     mean_price = combined_calendar['price'].mean()
     std_error_price = combined_calendar['price'].sem()
     threshold = 3 * std_error_price
@@ -266,7 +267,8 @@ def combine_calendar():
     # Correctly apply the filter to the entire DataFrame
     combined_calendar = combined_calendar[
         (combined_calendar['price'] >= mean_price - threshold) &
-        (combined_calendar['price'] <= mean_price + threshold)]
+        (combined_calendar['price'] <= mean_price + threshold)
+    ]
     
     combined_calendar['date'] = pd.to_datetime(combined_calendar['date'])
     
@@ -283,9 +285,8 @@ def combine_calendar():
     # Date column based on year and month = output is firts date in month
     grouped_calendar['date'] = pd.to_datetime(grouped_calendar['year'].astype(str) + '-' + grouped_calendar['month'].astype(str) + '-01')
     
-    grouped_calendar.head(100)
-
     return grouped_calendar
+
 
 
 ##### JOIN LISTINGS TO CALENDAR
