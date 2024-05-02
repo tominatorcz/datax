@@ -259,6 +259,14 @@ def combine_calendar():
     combined_calendar['price'] = combined_calendar['price'].str.replace(',', '')
     # Convert to float (or int if needed)
     combined_calendar['price'] = combined_calendar['price'].astype(float)
+    # Remove outliers
+    mean_price = combined_calendar['price'].mean()
+    std_error_price = combined_calendar['price'].sem()
+    threshold = 3 * std_error_price
+    combined_calendar['price'] = combined_calendar[
+    (combined_calendar['price'] >= mean_price - threshold) &
+    (combined_calendar['price'] <= mean_price + threshold)
+]
     
     combined_calendar['date'] = pd.to_datetime(combined_calendar['date'])
     
