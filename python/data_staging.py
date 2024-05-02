@@ -267,11 +267,11 @@ def combine_calendar():
 
     combined_calendar['price'].head()
     # Logarithmic transformation
-    combined_calendar['price'] = np.log(combined_calendar['price'])
-    combined_calendar['price'].head()
+    #combined_calendar['price'] = np.log(combined_calendar['price'])
+    #combined_calendar['price'].head()
     # Calculate lower and upper thresholds based on percentiles
-    lower_threshold = combined_calendar['price'].quantile(0.05)
-    upper_threshold = combined_calendar['price'].quantile(0.95)
+    lower_threshold = combined_calendar['price'].quantile(0.01)
+    upper_threshold = combined_calendar['price'].quantile(0.96)
 
 # Filter the DataFrame to keep only the rows within the specified quantiles
     combined_calendar = combined_calendar[
@@ -288,7 +288,7 @@ def combine_calendar():
     #]
     #combined_calendar['price'].head()
     # Revert the log-transformed prices back to their original scale
-    combined_calendar['price'] = np.exp(combined_calendar['price'])
+    #combined_calendar['price'] = np.exp(combined_calendar['price'])
     
     combined_calendar['date'] = pd.to_datetime(combined_calendar['date'])
     
@@ -315,7 +315,7 @@ def combine_calendar_listings():
     # Select only the first 100 rows from combined_calendar
     #combined_calendar_head = combined_calendar.head(200000)
     
-    combined_calendar_listings = pd.merge(combined_listings, combined_calendar, how='left', left_on='id', right_on='listing_id')
+    combined_calendar_listings = pd.merge(combined_listings, combined_calendar, how='right', left_on='id', right_on='listing_id')
 
     return combined_calendar_listings
 
