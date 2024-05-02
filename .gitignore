@@ -15,3 +15,4 @@ data/listings_detail_9-23.csv
 data/listings_detail_12-23.csv
 data/neighbourhoods.geojson
 data/neighbourhoods.csv
+optimized_forest_model.pkl
