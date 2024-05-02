@@ -264,14 +264,31 @@ def combine_calendar():
     combined_calendar['price'] = combined_calendar['price'].str.replace(',', '')
     # Convert to float (or int if needed)
     combined_calendar['price'] = combined_calendar['price'].astype(float)
-    # Remove outliers
-    mean_price = combined_calendar['price'].mean()
-    std_error_price = combined_calendar['price'].sem()
-    threshold = 2 * std_error_price
+
+    combined_calendar['price'].head()
+    # Logarithmic transformation
+    combined_calendar['price'] = np.log(combined_calendar['price'])
+    combined_calendar['price'].head()
+    # Calculate lower and upper thresholds based on percentiles
+    lower_threshold = combined_calendar['price'].quantile(0.05)
+    upper_threshold = combined_calendar['price'].quantile(0.95)
+
+# Filter the DataFrame to keep only the rows within the specified quantiles
     combined_calendar = combined_calendar[
-        (combined_calendar['price'] >= mean_price - threshold) &
-        (combined_calendar['price'] <= mean_price + threshold)
-    ]
+    (combined_calendar['price'] >= lower_threshold) &
+    (combined_calendar['price'] <= upper_threshold)
+]
+    # Remove outliers
+    #mean_price = combined_calendar['price'].mean()
+    #std_error_price = combined_calendar['price'].sem()
+    #threshold = 3 * std_error_price
+    #combined_calendar = combined_calendar[
+    #    (combined_calendar['price'] >= mean_price - threshold) &
+    #    (combined_calendar['price'] <= mean_price + threshold)
+    #]
+    #combined_calendar['price'].head()
+    # Revert the log-transformed prices back to their original scale
+    combined_calendar['price'] = np.exp(combined_calendar['price'])
     
     combined_calendar['date'] = pd.to_datetime(combined_calendar['date'])
     
@@ -320,6 +337,7 @@ def clean_calendar_listings():
     clean_combined_data_sorted = clean_combined_data.sort_values(by='date')
 
     return clean_combined_data_sorted
+
     
 
 ##### EXPORT FILE to PICKLE
