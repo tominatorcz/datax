@@ -76,64 +76,65 @@ def listings_transformation():
     ### neighbourhood_cleansed
     # Define the mapping dictionary
     mapping_dict = {
-    'Běchovice': 'Prague-outskirts',
-    'Benice': 'Prague-outskirts',
-    'Březiněves': 'Prague-outskirts',
-    'Čakovice': 'Prague-outskirts',
-    'Ďáblice': 'Prague-outskirts',
-    'Dolní Chabry': 'Prague-outskirts',
-    'Dolní Měcholupy': 'Prague-outskirts',
-    'Dolní Počernice': 'Prague-outskirts',
-    'Dubeč': 'Prague-outskirts',
-    'Klánovice': 'Prague-outskirts',
-    'Koloděje': 'Prague-outskirts',
-    'Kolovraty': 'Prague-outskirts',
-    'Královice': 'Prague-outskirts',
-    'Křeslice': 'Prague-outskirts',
-    'Kunratice': 'Prague-outskirts',
-    'Libuš': 'Prague-outskirts',
-    'Lipence': 'Prague-outskirts',
-    'Lochkov': 'Prague-outskirts',
-    'Lysolaje': 'Prague-outskirts',
-    'Nebušice': 'Prague-outskirts',
-    'Nedvězí': 'Prague-outskirts',
-    'Petrovice': 'Prague-outskirts',
-    'Praha 1': 'Prague-center',
-    'Praha 10': 'Prague',
-    'Praha 11': 'Prague',
-    'Praha 12': 'Prague-outskirts',
-    'Praha 13': 'Prague-outskirts',
-    'Praha 14': 'Prague',
-    'Praha 15': 'Prague-outskirts',
-    'Praha 16': 'Prague-outskirts',
-    'Praha 17': 'Prague-outskirts',
-    'Praha 18': 'Prague',
-    'Praha 19': 'Prague-outskirts',
-    'Praha 2': 'Prague-center',
-    'Praha 20': 'Prague-outskirts',
-    'Praha 21': 'Prague-outskirts',
-    'Praha 22': 'Prague-outskirts',
-    'Praha 3': 'Prague',
-    'Praha 4': 'Prague',
-    'Praha 5': 'Prague',
-    'Praha 6': 'Prague',
-    'Praha 7': 'Prague',
-    'Praha 8': 'Prague',
-    'Praha 9': 'Prague',
-    'Přední Kopanina': 'Prague-outskirts',
-    'Řeporyje': 'Prague-outskirts',
-    'Satalice': 'Prague-outskirts',
-    'Šeberov': 'Prague-outskirts',
-    'Slivenec': 'Prague-outskirts',
-    'Štěrboholy': 'Prague-outskirts',
-    'Suchdol': 'Prague-outskirts',
-    'Troja': 'Prague-outskirts',
-    'Újezd': 'Prague-outskirts',
-    'Velká Chuchle': 'Prague-outskirts',
-    'Vinoř': 'Prague-outskirts',
-    'Zbraslav': 'Prague-outskirts',
-    'Zličín': 'Prague-outskirts'
+        'Běchovice': 'Prague-outskirts',
+        'Benice': 'Prague-outskirts',
+        'Březiněves': 'Prague-outskirts',
+        'Čakovice': 'Prague-outskirts',
+        'Ďáblice': 'Prague-outskirts',
+        'Dolní Chabry': 'Prague-outskirts',
+        'Dolní Měcholupy': 'Prague-outskirts',
+        'Dolní Počernice': 'Prague-outskirts',
+        'Dubeč': 'Prague-outskirts',
+        'Klánovice': 'Prague-outskirts',
+        'Koloděje': 'Prague-outskirts',
+        'Kolovraty': 'Prague-outskirts',
+        'Královice': 'Prague-outskirts',
+        'Křeslice': 'Prague-outskirts',
+        'Kunratice': 'Prague-outskirts',
+        'Libuš': 'Prague-outskirts',
+        'Lipence': 'Prague-outskirts',
+        'Lochkov': 'Prague-outskirts',
+        'Lysolaje': 'Prague-outskirts',
+        'Nebušice': 'Prague-outskirts',
+        'Nedvězí': 'Prague-outskirts',
+        'Petrovice': 'Prague-outskirts',
+        'Praha 1': 'Prague-center',
+        'Praha 10': 'Prague',
+        'Praha 11': 'Prague',
+        'Praha 12': 'Prague-outskirts',
+        'Praha 13': 'Prague-outskirts',
+        'Praha 14': 'Prague',
+        'Praha 15': 'Prague-outskirts',
+        'Praha 16': 'Prague-outskirts',
+        'Praha 17': 'Prague-outskirts',
+        'Praha 18': 'Prague',
+        'Praha 19': 'Prague-outskirts',
+        'Praha 2': 'Prague-center',
+        'Praha 20': 'Prague-outskirts',
+        'Praha 21': 'Prague-outskirts',
+        'Praha 22': 'Prague-outskirts',
+        'Praha 3': 'Prague',
+        'Praha 4': 'Prague',
+        'Praha 5': 'Prague',
+        'Praha 6': 'Prague',
+        'Praha 7': 'Prague',
+        'Praha 8': 'Prague',
+        'Praha 9': 'Prague',
+        'Přední Kopanina': 'Prague-outskirts',
+        'Řeporyje': 'Prague-outskirts',
+        'Satalice': 'Prague-outskirts',
+        'Šeberov': 'Prague-outskirts',
+        'Slivenec': 'Prague-outskirts',
+        'Štěrboholy': 'Prague-outskirts',
+        'Suchdol': 'Prague-outskirts',
+        'Troja': 'Prague-outskirts',
+        'Újezd': 'Prague-outskirts',
+        'Velká Chuchle': 'Prague-outskirts',
+        'Vinoř': 'Prague-outskirts',
+        'Zbraslav': 'Prague-outskirts',
+        'Zličín': 'Prague-outskirts'
     }
+
     # Map the group to neighourhoods
     listings['neighbourhood_group'] = listings['neighbourhood_cleansed'].map(mapping_dict)
     listings['neighbourhood_cleansed'] = listings['neighbourhood_group']
@@ -212,21 +213,21 @@ def listings_transformation():
     listings['beds'] = listings['beds'].fillna(1)
     
     ### amenities - too many individual values
-    """# Convert string representation of list to actual list
-    listings['amenities'] = listings['amenities'].apply(ast.literal_eval)
-    # Convert each cell in the 'amenities' column to a list and flatten all lists
-    all_amenities = [item for sublist in listings['amenities'] for item in sublist]
-    all_amenities
-    listings['amenities'] 
-    # Remove duplicates by converting to a set
-    unique_amenities = set(all_amenities)
-    # Convert back to a list if needed
-    unique_amenities_list = list(unique_amenities)
-    print(unique_amenities_list)
-    # Create a dataframe from the unique amenities list
-    amenities_df = pd.DataFrame(unique_amenities_list, columns=['Amenity'])
-    # Write the dataframe to a CSV file with encoding specified
-    amenities_df.to_csv('unique_amenities.csv', index=False, encoding='utf-8')"""
+    ## Convert string representation of list to actual list
+    #listings['amenities'] = listings['amenities'].apply(ast.literal_eval)
+    ## Convert each cell in the 'amenities' column to a list and flatten all lists
+    #all_amenities = [item for sublist in listings['amenities'] for item in sublist]
+    #all_amenities
+    #listings['amenities'] 
+    ## Remove duplicates by converting to a set
+    #unique_amenities = set(all_amenities)
+    ## Convert back to a list if needed
+    #unique_amenities_list = list(unique_amenities)
+    #print(unique_amenities_list)
+    ## Create a dataframe from the unique amenities list
+    #amenities_df = pd.DataFrame(unique_amenities_list, columns=['Amenity'])
+    ## Write the dataframe to a CSV file with encoding specified
+    #amenities_df.to_csv('unique_amenities.csv', index=False, encoding='utf-8')
 
     ### instant_bookable
     # Create boolean column, t=1, f=0
@@ -265,31 +266,16 @@ def combine_calendar():
     # Convert to float (or int if needed)
     combined_calendar['price'] = combined_calendar['price'].astype(float)
 
-    combined_calendar['price'].head()
-    # Logarithmic transformation
-    #combined_calendar['price'] = np.log(combined_calendar['price'])
-    #combined_calendar['price'].head()
+    ## Remove outliers
     # Calculate lower and upper thresholds based on percentiles
     lower_threshold = combined_calendar['price'].quantile(0.01)
     upper_threshold = combined_calendar['price'].quantile(0.96)
-
-# Filter the DataFrame to keep only the rows within the specified quantiles
+    # Filter the DataFrame to keep only the rows within the specified quantiles
     combined_calendar = combined_calendar[
     (combined_calendar['price'] >= lower_threshold) &
-    (combined_calendar['price'] <= upper_threshold)
-]
-    # Remove outliers
-    #mean_price = combined_calendar['price'].mean()
-    #std_error_price = combined_calendar['price'].sem()
-    #threshold = 3 * std_error_price
-    #combined_calendar = combined_calendar[
-    #    (combined_calendar['price'] >= mean_price - threshold) &
-    #    (combined_calendar['price'] <= mean_price + threshold)
-    #]
-    #combined_calendar['price'].head()
-    # Revert the log-transformed prices back to their original scale
-    #combined_calendar['price'] = np.exp(combined_calendar['price'])
+    (combined_calendar['price'] <= upper_threshold)]
     
+    # Change date to datetime
     combined_calendar['date'] = pd.to_datetime(combined_calendar['date'])
     
     # Adding columns for following group by operations
@@ -315,6 +301,7 @@ def combine_calendar_listings():
     # Select only the first 100 rows from combined_calendar
     #combined_calendar_head = combined_calendar.head(200000)
     
+    # Runs right join on calendar from listings
     combined_calendar_listings = pd.merge(combined_listings, combined_calendar, how='right', left_on='id', right_on='listing_id')
 
     return combined_calendar_listings
@@ -322,7 +309,8 @@ def combine_calendar_listings():
 ##### CLEAN COMBINED FILE
 def clean_calendar_listings():
     combined_data = combine_calendar_listings()
-    clean_combined_data = combined_data.drop(columns=['listing_id', 'id', 'description_bins', 
+    # Obsolete columns to drop
+    clean_combined_data = combined_data.drop(columns=['listing_id', 'id', 'description_bins', 'host_since_bins',
                                                       'neighborhood_overview_bins', 'neighbourhood_group', 
                                                       'host_about_bins', 'host_is_superhost_bool', 
                                                       'host_has_profile_pic_bool', 'host_identity_verified_bool',
@@ -334,8 +322,6 @@ def clean_calendar_listings():
     clean_combined_data_sorted = clean_combined_data.sort_values(by='date')
 
     return clean_combined_data_sorted
-
-    
 
 ##### EXPORT FILE to PICKLE
 #clean_calendar_listings().to_pickle('../data/combined.pickle')
