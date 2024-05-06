@@ -266,6 +266,14 @@ def combine_calendar():
     # Convert to float (or int if needed)
     combined_calendar['price'] = combined_calendar['price'].astype(float)
 
+    # Create a boxplot of the price column
+    #plt.figure(figsize=(8, 6))
+    #plt.boxplot(combined_calendar['price'])
+    #plt.xlabel('Price')
+    #plt.ylabel('Distribution')
+    #plt.title('Boxplot of Price')
+    #plt.show()
+
     ## Remove outliers
     # Calculate lower and upper thresholds based on percentiles
     lower_threshold = combined_calendar['price'].quantile(0.01)
@@ -320,6 +328,19 @@ def clean_calendar_listings():
 
     # Sort DataFrame by the "date" column
     clean_combined_data_sorted = clean_combined_data.sort_values(by='date')
+
+    # Group the data by neighborhood_cleansed and calculate the average price
+    avg_price_per_neighbourhood = clean_combined_data.groupby('neighbourhood_cleansed')['avg_price'].mean().sort_values()
+
+    # Create a bar plot
+    #plt.figure(figsize=(12, 8))
+    #avg_price_per_neighbourhood.plot(kind='bar', color='skyblue')
+    #plt.xlabel('Neighborhood')
+    #plt.ylabel('Average Price')
+    #plt.title('Average Price per Neighborhood')
+    #plt.xticks(rotation=45, ha='right')
+    #plt.tight_layout()
+    #plt.show()
 
     return clean_combined_data_sorted
 
