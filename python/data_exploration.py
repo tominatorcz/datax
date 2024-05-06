@@ -29,7 +29,6 @@ list(listings.columns)
 # Number of elements in the array
 listings.size
 
-
 ############ DESCRIBE COLUMN ##############
 # Define function to describe each column
 """Tomi funkce:
